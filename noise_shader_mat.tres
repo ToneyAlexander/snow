@@ -1,0 +1,65 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://dkq1ofqvvuqyc"]
+
+[sub_resource type="Shader" id="Shader_yihp4"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.3.stable's StandardMaterial3D.
+
+shader_type spatial;
+render_mode unshaded;
+
+uniform vec4 albedo : source_color;
+uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform float alpha_scissor_threshold : hint_range(0.0, 1.0, 0.001);
+uniform float point_size : hint_range(0.1, 128.0, 0.1);
+
+
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
+
+uniform bool is_shadow_pass = false;
+// ugh what am I doing
+// scolling texture makes the snowflakes glitter
+void fragment() {
+	vec2 base_uv = UV; //scrolling + 1.0f * TIME * .01f;
+	ALPHA_SCISSOR_THRESHOLD = alpha_scissor_threshold;
+	vec4 albedo_tex = texture(texture_albedo, base_uv);
+
+	if (is_shadow_pass) {
+        ALBEDO = vec3(0.0); // Black color for shadows
+        ALPHA = albedo_tex.a; // Use alpha from the texture for shadow transparency
+    }else{
+
+
+		ALBEDO = albedo.rgb * albedo_tex.rgb;
+
+		ALPHA *= albedo.a * albedo_tex.a;
+	}
+
+
+}
+"
+
+[sub_resource type="Gradient" id="Gradient_28aoi"]
+colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 0)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_jnlp7"]
+noise_type = 2
+frequency = 0.845
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_l8v81"]
+color_ramp = SubResource("Gradient_28aoi")
+noise = SubResource("FastNoiseLite_jnlp7")
+
+[resource]
+render_priority = 0
+shader = SubResource("Shader_yihp4")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = SubResource("NoiseTexture2D_l8v81")
+shader_parameter/alpha_scissor_threshold = 0.592
+shader_parameter/point_size = 1.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/uv2_scale = Vector3(1, 1, 1)
+shader_parameter/uv2_offset = Vector3(0, 0, 0)
+shader_parameter/is_shadow_pass = false

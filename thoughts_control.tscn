@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://csyo8x2sca3w5"]
+
+[ext_resource type="Theme" uid="uid://hqmbgt8f38n0" path="res://font_theme_1.tres" id="1_6vm8e"]
+[ext_resource type="Script" uid="uid://8c53h58jrsy1" path="res://thoughts.gd" id="2_w6dbb"]
+
+[node name="thoughts" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 170.0
+offset_top = 154.0
+offset_right = -197.0
+offset_bottom = -504.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1_6vm8e")
+script = ExtResource("2_w6dbb")
+
+[node name="Label" type="Label" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 42.0
+text = "design the fancy node here, it's scene and we instantiate"

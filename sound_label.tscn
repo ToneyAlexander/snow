@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://dbqku6s1nigxc"]
+
+[ext_resource type="Script" uid="uid://dr8nxjsryc53p" path="res://sound_label.gd" id="1_n3vlq"]
+
+[node name="label" type="Label"]
+visible = false
+offset_left = 1801.0
+offset_top = 81.0
+offset_right = 1841.0
+offset_bottom = 121.0
+theme_override_colors/font_color = Color(0.952941, 0.92549, 0.196078, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 5
+theme_override_font_sizes/font_size = 60
+text = "*sound*"
+script = ExtResource("1_n3vlq")

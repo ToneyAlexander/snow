@@ -1,0 +1,178 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dbqvsjmrdpww1"]
+
+[sub_resource type="Shader" id="Shader_c6w14"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.3.stable's StandardMaterial3D.
+
+shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_burley, specular_schlick_ggx, vertex_lighting;
+
+uniform vec4 albedo : source_color;
+uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform float point_size : hint_range(0.1, 128.0, 0.1);
+
+uniform float roughness : hint_range(0.0, 1.0);
+uniform sampler2D texture_metallic : hint_default_white, filter_linear_mipmap, repeat_enable;
+uniform vec4 metallic_texture_channel;
+uniform sampler2D texture_roughness : hint_roughness_r, filter_linear_mipmap, repeat_enable;
+
+uniform float specular : hint_range(0.0, 1.0, 0.01);
+uniform float metallic : hint_range(0.0, 1.0, 0.01);
+
+uniform int particles_anim_h_frames : hint_range(1, 128);
+uniform int particles_anim_v_frames : hint_range(1, 128);
+uniform bool particles_anim_loop;
+
+uniform float x_n : hint_range(-1.0, 1.0, 0.01);
+uniform float y_n : hint_range(-1.0, 1.0, 0.01);
+uniform float z_n : hint_range(-1.0, 1.0, 0.01);
+
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
+
+void vertex() {
+	// Shading Mode: Per Vertex
+	ROUGHNESS = roughness;
+
+	UV = UV * uv1_scale.xy + uv1_offset.xy;
+
+	//random flakes have darker albedo?
+
+
+	//Store normal vector
+	//vec3 world_normal = (MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz;
+	//world_normal = vec3(0.0, 1.0, 0.0);
+	//normed:
+	//000 is gray
+	//111 is mid toned
+	//010 is bright
+	///vec3(id,1,id)
+	//How do I get light in light, gray in shade?
+	//unnormed
+	/*
+	-1-1-1 top right bright
+	-1-10 gray
+	-1-11 bommotm right bright
+	-10-1 top right slash
+	-100 right
+	-101 bommtom sight slash
+	-11-1 midtone?
+	-110 midtone?
+	-111 midtone?
+	0-1-1 gray
+	0-10 gray
+	0-11 gray
+	00-1 top
+	000 gray
+	001 bottom
+	01-1 midtone
+	010 midtone
+	011 midtone
+	*/
+
+	//000 is gray
+	//111 is mid toned
+	//010 is bright
+
+	vec3 world_normal;
+	int id2 = INSTANCE_ID%3;
+	if (id2 == 0){
+		world_normal = normalize(vec3(0,0,0));
+	}else if(id2 == 1){
+		world_normal = normalize(vec3(1,1,1));//normalize(vec3(.5,1,.5));
+	}else if(id2 == 2){
+		world_normal = normalize(vec3(1,1,1));
+	}
+
+
+	float id = float(INSTANCE_ID%3);
+	world_normal = vec3(x_n,y_n,z_n);
+	//NORMAL = normalize(MODELVIEW_NORMAL_MATRIX * world_normal);
+
+	//normalize(vec3(A,y_n,INV_VIEW_MATRIX[2].z));
+
+	// Billboard Mode: Particles
+	mat4 mat_world = mat4(
+			normalize(INV_VIEW_MATRIX[0]),
+			normalize(INV_VIEW_MATRIX[1]),
+			normalize(INV_VIEW_MATRIX[2]),
+			MODEL_MATRIX[3]);
+	mat_world = mat_world * mat4(
+			vec4(cos(INSTANCE_CUSTOM.x), -sin(INSTANCE_CUSTOM.x), 0.0, 0.0),
+			vec4(sin(INSTANCE_CUSTOM.x), cos(INSTANCE_CUSTOM.x), 0.0, 0.0),
+			vec4(0.0, 0.0, 1.0, 0.0),
+			vec4(0.0, 0.0, 0.0, 1.0));
+	MODELVIEW_MATRIX = VIEW_MATRIX * mat_world;
+
+	// Billboard Keep Scale: Enabled
+	MODELVIEW_MATRIX = MODELVIEW_MATRIX * mat4(
+			vec4(length(MODEL_MATRIX[0].xyz), 0.0, 0.0, 0.0),
+			vec4(0.0, length(MODEL_MATRIX[1].xyz), 0.0, 0.0),
+			vec4(0.0, 0.0, length(MODEL_MATRIX[2].xyz), 0.0),
+			vec4(0.0, 0.0, 0.0, 1.0));
+
+	//MODELVIEW_NORMAL_MATRIX = mat3(MODELVIEW_MATRIX);
+	MODELVIEW_NORMAL_MATRIX = mat3(VIEW_MATRIX) * mat3(MODEL_MATRIX);
+
+	//NORMAL = normalize(mat3(MODELVIEW_MATRIX) * NORMAL);
+
+	//Gray snow in shade, yellow in the light
+	//mat3 billboard_rot = mat3(MODELVIEW_MATRIX);
+	//vec3 camera_facing_normal = normalize(billboard_rot * vec3(1.0, 0.0, 0.0)); // Example default normal
+	//NORMAL = normalize(vec3(camera_facing_normal.x, y_n, camera_facing_normal.z));
+	NORMAL = normalize(world_normal);
+
+	float h_frames = float(particles_anim_h_frames);
+	float v_frames = float(particles_anim_v_frames);
+	float particle_total_frames = float(particles_anim_h_frames * particles_anim_v_frames);
+	float particle_frame = floor(INSTANCE_CUSTOM.z * float(particle_total_frames));
+	if (!particles_anim_loop) {
+		particle_frame = clamp(particle_frame, 0.0, particle_total_frames - 1.0);
+	} else {
+		particle_frame = mod(particle_frame, particle_total_frames);
+	}
+	UV /= vec2(h_frames, v_frames);
+	UV += vec2(mod(particle_frame, h_frames) / h_frames, floor((particle_frame + 0.5) / h_frames) / v_frames);
+
+}
+
+void fragment() {
+	vec2 base_uv = UV;
+
+	vec4 albedo_tex = texture(texture_albedo, base_uv);
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+
+	float metallic_tex = dot(texture(texture_metallic, base_uv), metallic_texture_channel);
+	METALLIC = metallic_tex * metallic;
+	SPECULAR = specular;
+
+	vec4 roughness_texture_channel = vec4(1.0, 0.0, 0.0, 0.0);
+	float roughness_tex = dot(texture(texture_roughness, base_uv), roughness_texture_channel);
+	ROUGHNESS = roughness_tex * roughness;
+}
+
+/*
+Inverse View Matrix:
+[X: (0.995572, -0.01313, 0.093078), Y: (0.021634, 0.99562, -0.090956), Z: (-0.091476, 0.092567, 0.991496), O: (-0.323888, 1.980472, -1.289222)]
+*/"
+
+[resource]
+render_priority = 0
+shader = SubResource("Shader_c6w14")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/point_size = 1.0
+shader_parameter/roughness = 1.0
+shader_parameter/metallic_texture_channel = Vector4(0, 0, 0, 0)
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/particles_anim_h_frames = 1
+shader_parameter/particles_anim_v_frames = 1
+shader_parameter/particles_anim_loop = false
+shader_parameter/x_n = 1.0
+shader_parameter/y_n = 1.0
+shader_parameter/z_n = 1.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/uv2_scale = Vector3(1, 1, 1)
+shader_parameter/uv2_offset = Vector3(0, 0, 0)

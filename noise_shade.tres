@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://cmlsuqtykpo8p"]
+
+[ext_resource type="Shader" path="res://snow_shadow.gdshader" id="1_iiap2"]
+[ext_resource type="Texture2D" uid="uid://c52u47s1tafm1" path="res://noisealbedo.tres" id="2_7dpg3"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_iiap2")
+shader_parameter/albedo_texture = ExtResource("2_7dpg3")

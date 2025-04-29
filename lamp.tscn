@@ -1,0 +1,117 @@
+[gd_scene load_steps=9 format=3 uid="uid://o3lil354xybc"]
+
+[ext_resource type="Script" uid="uid://k4quu5gu1lt7" path="res://lamp.gd" id="1_vxcd3"]
+[ext_resource type="Texture2D" uid="uid://c52u47s1tafm1" path="res://noisealbedo.tres" id="2_qfipa"]
+
+[sub_resource type="Shader" id="Shader_n7rru"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.3.stable's StandardMaterial3D.
+
+shader_type spatial;
+render_mode unshaded;
+
+uniform vec4 albedo : source_color;
+uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform float alpha_scissor_threshold : hint_range(0.0, 1.0, 0.001);
+uniform float point_size : hint_range(0.1, 128.0, 0.1);
+
+
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
+
+uniform bool is_shadow_pass = false;
+// scolling texture makes the snowflakes glitter - only when moving though
+void fragment() {
+	vec2 base_uv = UV;// + 1.0f * TIME * .01f;
+	ALPHA_SCISSOR_THRESHOLD = alpha_scissor_threshold;
+	vec4 albedo_tex = texture(texture_albedo, base_uv);
+
+	if (is_shadow_pass) {
+        ALBEDO = vec3(0.0); // Black color for shadows
+        ALPHA = albedo_tex.a; // Use alpha from the texture for shadow transparency
+    }else{
+
+
+		ALBEDO = albedo.rgb * albedo_tex.rgb;
+
+		ALPHA *= albedo.a * albedo_tex.a;
+	}
+
+
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gd4vy"]
+render_priority = 0
+shader = SubResource("Shader_n7rru")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("2_qfipa")
+shader_parameter/alpha_scissor_threshold = 0.592
+shader_parameter/point_size = 1.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/uv2_scale = Vector3(1, 1, 1)
+shader_parameter/uv2_offset = Vector3(0, 0, 0)
+shader_parameter/is_shadow_pass = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_b6kmw"]
+material = SubResource("ShaderMaterial_gd4vy")
+size = Vector2(7, 7)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_qyxfc"]
+height = 8.0
+radius = 0.1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hdtuh"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 8.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_hjuyy"]
+size = Vector2(0.5, 1.5)
+
+[node name="lamp" type="Node3D"]
+script = ExtResource("1_vxcd3")
+
+[node name="scrollingTex" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 4.81543, 0)
+layers = 524288
+cast_shadow = 3
+mesh = SubResource("QuadMesh_b6kmw")
+
+[node name="post" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="post"]
+shape = SubResource("CylinderShape3D_qyxfc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="post"]
+mesh = SubResource("CylinderMesh_hdtuh")
+skeleton = NodePath("../CollisionShape3D")
+
+[node name="lights" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 5.572, 1.354)
+
+[node name="bulb" type="MeshInstance3D" parent="lights"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_hjuyy")
+
+[node name="worldlight" type="SpotLight3D" parent="lights"]
+light_color = Color(1, 1, 0.513726, 1)
+light_cull_mask = 4294443007
+shadow_enabled = true
+shadow_bias = 0.826
+shadow_caster_mask = 4294443007
+spot_range = 12.0
+spot_attenuation = -0.63
+spot_angle = 40.0
+
+[node name="snowlight" type="SpotLight3D" parent="lights"]
+layers = 524288
+light_color = Color(1, 1, 0.513726, 1)
+light_cull_mask = 4294443008
+shadow_enabled = true
+shadow_caster_mask = 4294443008
+spot_range = 12.0
+spot_attenuation = -0.63
+spot_angle = 40.0
