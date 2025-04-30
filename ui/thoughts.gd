@@ -13,7 +13,6 @@ func _ready() -> void:
 # finer tuned control - keeping thoughts across nodes
 func _think(thought: String):
 	if thought in thoughts:
-		
 		self.remove_child(thoughts[thought])
 		thoughts.erase(thought)
 	else:
@@ -23,6 +22,3 @@ func _think(thought: String):
 		lbl.add_theme_constant_override("outline_size", 18)
 		self.add_child(lbl)
 		thoughts[thought] = lbl
-		
-		
-	

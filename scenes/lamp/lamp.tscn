@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://o3lil354xybc"]
 
-[ext_resource type="Script" uid="uid://k4quu5gu1lt7" path="res://lamp.gd" id="1_vxcd3"]
+[ext_resource type="Script" uid="uid://k4quu5gu1lt7" path="res://scenes/lamp/lamp.gd" id="1_vxcd3"]
 [ext_resource type="Texture2D" uid="uid://c52u47s1tafm1" path="res://noisealbedo.tres" id="2_qfipa"]
 
 [sub_resource type="Shader" id="Shader_n7rru"]

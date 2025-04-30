@@ -11,7 +11,7 @@ var unregistered_data = {}
 func _ready() -> void:
 	for item in registered_order:
 		registered_set[item] = null
-	SignalBus.connect("_debug_display", recieve_event) 
+	SignalBus.connect("_debug_display", recieve_event)
 
 
 func recieve_event(tag: String, input_value):

@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://csyo8x2sca3w5"]
 
 [ext_resource type="Theme" uid="uid://hqmbgt8f38n0" path="res://font_theme_1.tres" id="1_6vm8e"]
-[ext_resource type="Script" uid="uid://8c53h58jrsy1" path="res://thoughts.gd" id="2_w6dbb"]
+[ext_resource type="Script" uid="uid://8c53h58jrsy1" path="res://ui/thoughts.gd" id="2_w6dbb"]
 
 [node name="thoughts" type="Control"]
 layout_mode = 3

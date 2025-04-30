@@ -5,39 +5,14 @@ extends Control
 @onready var scrollContainer: ScrollContainer = $logScroll
 
 @onready var buttonBox: HFlowContainer = $options
-@onready var op1: Button = $options/op1
-@onready var op2: Button = $options/op2
 
 var conversation = []
 
 var dialog_tree: DialogState
+var current_partner = ""
 
-var thoughts_control = preload("res://thoughts_control.tscn")
+var thoughts_control = preload("res://ui/thoughts_control.tscn")
 var thoughts_scene
-
-
-class DialogState extends RefCounted:
-	var you: bool = true
-	var directions: Array[String] = []
-	var choices: Dictionary[String, DialogEdge] = {}
-	
-	func _init(p_directions: Array[String], p_choices: Dictionary[String, DialogEdge], p_you = true):
-		self.you = p_you
-		self.directions = p_directions
-		self.choices = p_choices
-		
-	func choose(choice: String) -> DialogEdge:
-		return self.choices.get(choice)
-	
-class DialogEdge:
-	var response: String
-	var they_say: String
-	var destination: DialogState
-	
-	func _init(p_response, p_they_say, p_destination):
-		self.response = p_response
-		self.they_say = p_they_say
-		self.destination = p_destination
 	
 	
 func clear_children(node):
@@ -49,11 +24,10 @@ func _ready() -> void:
 	self.thoughts_scene = thoughts_control.instantiate()
 	get_tree().root.add_child(thoughts_scene)
 	
-	SignalBus.connect("_conversation", recieve_event)
+	SignalBus.connect("_conversation", recieve_conversing_event)
 	exit.pressed.connect(_exit_pressed)
 	
-	dialog_tree = build()
-	_render_choices()
+	#_render_choices()
 
 
 func _render_choices():
@@ -89,10 +63,11 @@ func _dialog_selected(button: Button):
 		_render_choices()
 
 
-func recieve_event(conversing: bool):
+func recieve_conversing_event(conversing: bool, partner: String):
 	self.visible = conversing
 	if conversing:
-		self.dialog_tree = build()
+		current_partner = partner
+		self.dialog_tree = WorldState.get_conversation(partner)
 		self.conversation = []
 		_render_choices()
 	
@@ -101,7 +76,7 @@ func _exit_pressed():
 	clear_children(logContainer)
 	get_tree().root.remove_child(thoughts_scene)
 	thoughts_scene.queue_free()
-	SignalBus._conversation.emit(false)
+	SignalBus._conversation.emit(false, current_partner)
 	self.queue_free()
 
 func bottom_scroll():
@@ -137,8 +112,8 @@ func add_line(text: String, alignment: HBoxContainer.AlignmentMode):
 	element.add_theme_constant_override("outline_size", 18)
 	element.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	element.fit_content = true
-	margin.custom_minimum_size = Vector2(scrollContainer.size.x-10, 0)
-	box.custom_minimum_size = Vector2(scrollContainer.size.x-10, 0)
+	margin.custom_minimum_size = Vector2(scrollContainer.size.x - 10, 0)
+	box.custom_minimum_size = Vector2(scrollContainer.size.x - 10, 0)
 	
 	element.append_text("[" + ta + "]" + text + "[/" + ta + "]")
 	margin.add_child(element)
@@ -151,31 +126,3 @@ func add_me(text: String):
 	
 func add_you(text: String):
 	add_line(text, BoxContainer.ALIGNMENT_BEGIN)
-	
-
-func build() -> DialogState:
-	var branch1 = DialogState.new(["dir1", "dir2"], {
-		"short a": DialogEdge.new(
-			"A EXPANDED", "A RESPONSE", null
-		), "short b": DialogEdge.new(
-			"B EXPANDED", "B RESPONSE", null
-		)
-	})
-	
-	var branch2 = DialogState.new(["all roads lead to rome?", "tu ne cede malis..."], {
-		"Duis aute": DialogEdge.new(
-			"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.", "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.", branch1
-		)
-	})
-	
-	var root = DialogState.new(["🤔", "chilly", "Thea..."], {
-		"opta": DialogEdge.new(
-			"opta long response", "all roads lead to rome", branch1
-		), "Lorem ipsum dolor...": DialogEdge.new(
-			"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", branch2
-		)
-	})
-	return root
-
-
-	

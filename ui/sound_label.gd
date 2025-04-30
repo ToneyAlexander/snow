@@ -5,7 +5,7 @@ class_name SoundLabel extends Label
 # POLISH 012: decouple from camera bobbing
 # FEAT 013: Scrrensize again - scale properly, do it dynamically
 
-const sound_label: PackedScene = preload("res://sound_label.tscn")
+const sound_label: PackedScene = preload("res://ui/sound_label.tscn")
 
 var SCREEN_X = 1920.0
 var SCREEN_Y = 1080.0
@@ -45,21 +45,21 @@ func place_label(lerp_rate: float = .5):
 	
 	# scale font size on distance instead of object?
 	# Scale factor = intensity/(distance_constant + distance_squared)
-	var sf = I/(n+d_square)
+	var sf = I / (n + d_square)
 	
 	# BUG 009: bug where walking such that something moves from front to back makes it pop into bottom right corner?
 	if behind:
 		# flip it around
-		projection = Vector2(SCREEN_X, SCREEN_Y)-projection
+		projection = Vector2(SCREEN_X, SCREEN_Y) - projection
 		
 		projection -= Vector2(self.size.x, 0)
 		
 		# Translate this point to the oigin by the other point
-		projection = projection - Vector2(SCREEN_X/2, SCREEN_Y/2)
+		projection = projection - Vector2(SCREEN_X / 2, SCREEN_Y / 2)
 		# Scale at the (temporary, new) origin.
 		projection = projection * 2
 		#Translate back so that the origin goes back to the designated point.
-		projection = projection + Vector2(SCREEN_X/2, SCREEN_Y/2)
+		projection = projection + Vector2(SCREEN_X / 2, SCREEN_Y / 2)
 		
 		set("theme_override_colors/font_color", behind_color)
 		
@@ -73,8 +73,8 @@ func place_label(lerp_rate: float = .5):
 			projection,
 			lerp_rate
 		).clamp(
-			Vector2(2*SCREEN_X/20 + self.size.x*sf, 2*SCREEN_Y/20),
-			Vector2(16*SCREEN_X/20 + self.size.x*sf, 16*SCREEN_Y/20)
+			Vector2(2 * SCREEN_X / 20 + self.size.x * sf, 2 * SCREEN_Y / 20),
+			Vector2(16 * SCREEN_X / 20 + self.size.x * sf, 16 * SCREEN_Y / 20)
 		)
 	else:
 		set("theme_override_colors/font_color", front_color)
@@ -84,8 +84,8 @@ func place_label(lerp_rate: float = .5):
 			projection,
 			lerp_rate
 		).clamp(
-			Vector2(2*SCREEN_X/20,2*SCREEN_Y/20),
-			Vector2(16*SCREEN_X/20,16*SCREEN_Y/20)
+			Vector2(2 * SCREEN_X / 20, 2 * SCREEN_Y / 20),
+			Vector2(16 * SCREEN_X / 20, 16 * SCREEN_Y / 20)
 		)
 	self.visible = active and sf >= .25
 

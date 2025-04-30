@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dbqku6s1nigxc"]
 
-[ext_resource type="Script" uid="uid://dr8nxjsryc53p" path="res://sound_label.gd" id="1_n3vlq"]
+[ext_resource type="Script" uid="uid://dr8nxjsryc53p" path="res://ui/sound_label.gd" id="1_n3vlq"]
 
 [node name="label" type="Label"]
 visible = false

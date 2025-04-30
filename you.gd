@@ -15,8 +15,8 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var move_dir: Vector2 # Input direction for movement
 var look_dir: Vector2 # Input direction for look/aim
 
-var walk_vel: Vector3 # Walking velocity 
-var grav_vel: Vector3 # Gravity velocity 
+var walk_vel: Vector3 # Walking velocity
+var grav_vel: Vector3 # Gravity velocity
 var jump_vel: Vector3 # Jumping velocity
 
 @onready var camera: Camera3D = $Camera
@@ -32,7 +32,6 @@ var jump_vel: Vector3 # Jumping velocity
 
 
 @export var sound_ui: Control
-
 
 
 var camera_pos_offset: Vector3 = Vector3.ZERO
@@ -51,7 +50,7 @@ var look_accumulator: float = 0
 
 @export_range(0.0, 5.0, 0.1) var dizzy: float = 1.0
 @export_range(0.0, 2.0, 0.1) var limp: float = 0.9 # 0.8
-@export_range(0.0, 2.0, 0.1) var step_bob: float = 0.8 #1.20 #* 2
+@export_range(0.0, 2.0, 0.1) var step_bob: float = 0.8 # 1.20 #* 2
 
 
 var n = 0
@@ -64,16 +63,13 @@ var touch_environment: bool = false
 var touch_accumulator: float = 0
 
 
-
-
 var eyepos: Vector3 = Vector3(0, 0.441, 0)
 
 var conversing: bool = false
 var conversing_camera_transform
 
 
-
-var dialog_scene = preload("res://dialog_control.tscn")
+var dialog_scene = preload("res://ui/dialog_control.tscn")
 
 
 func _ready() -> void:
@@ -85,7 +81,7 @@ func _ready() -> void:
 # turn on turbulence
 # up the FPS by a ton
 
-func _conversation(is_conversing: bool):
+func _conversation(is_conversing: bool, partner: String):
 	self.conversing = is_conversing
 	if !self.conversing:
 		capture_mouse()
@@ -97,10 +93,6 @@ func _conversation(is_conversing: bool):
 
 func recieve_event(is_conversing: bool):
 	self.visible = is_conversing
-	
-func _exit_pressed():
-	SignalBus._conversation.emit(false)
-
 
 func capture_mouse() -> void:
 	if conversing:
@@ -123,7 +115,6 @@ func _physics_process(delta: float) -> void:
 		if look_accumulator > .5:
 			collider.lerp_look(self.global_position)
 		if look_accumulator > 1 and not conversing:
-			SignalBus._conversation.emit(true)
 			release_mouse()
 			#conversing_camera_transform = collider.get_transform()
 			#	bool has_method( String arg0 ) const
@@ -134,15 +125,15 @@ func _physics_process(delta: float) -> void:
 			camera.look_at(self.global_position + eyepos)
 			conversing = true
 			
-			
 			var dialog = dialog_scene.instantiate()
 			get_tree().root.add_child(dialog)
+
+			SignalBus._conversation.emit(true, "them")
 			
-			# huh?? what is this
+			# call trigger on the one I'm looking at
 			collider.trigger()
 	else:
 		look_accumulator = 0
-	
 	
 	
 	if conversing:
@@ -154,9 +145,8 @@ func _physics_process(delta: float) -> void:
 	delta_tracker = delta_tracker + delta
 
 		
-
 	var vel = Vector3(velocity)
-	vel.y = 0; #0 out y (up) component for xz velocity only
+	vel.y = 0; # 0 out y (up) component for xz velocity only
 	var vel_mag = vel.length()
 
 	if !is_on_floor():
@@ -164,7 +154,7 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	# Swaying in place
-	if(vel_mag <= 0.000001):
+	if (vel_mag <= 0.000001):
 		snowstep_l.stop()
 		snowstep_r.stop()
 		sound_ui.left_stop()
@@ -176,15 +166,15 @@ func _physics_process(delta: float) -> void:
 		
 		var time_to_sway = .5
 		if delta_tracker > time_to_sway:
-			next_camera_rot_offset.z = dizzy * .5 * .04 * cos((delta_tracker-time_to_sway) * cycle_scale * PI / 4)
+			next_camera_rot_offset.z = dizzy * .5 * .04 * cos((delta_tracker - time_to_sway) * cycle_scale * PI / 4)
 			
 			# Smooths the transition from standing to swaying - cosine
 			# Ratio approaches 1 as we near entering the regular cycle
-			if delta_tracker-time_to_sway < 2.0/cycle_scale:
-				var ratio = (delta_tracker-time_to_sway)/(2.0/cycle_scale)
+			if delta_tracker - time_to_sway < 2.0 / cycle_scale:
+				var ratio = (delta_tracker - time_to_sway) / (2.0 / cycle_scale)
 				next_camera_rot_offset.z = lerp(camera_rot_offset.z, next_camera_rot_offset.z, lerp(0.0, ratio, .1))
-			camera_pos_offset.x = dizzy * -2 * .04 * sin((delta_tracker-time_to_sway) * cycle_scale * PI / 4)
-			camera_pos_offset.y = dizzy * -1 * .04 * sin((delta_tracker-time_to_sway) * cycle_scale * PI / 2)
+			camera_pos_offset.x = dizzy * -2 * .04 * sin((delta_tracker - time_to_sway) * cycle_scale * PI / 4)
+			camera_pos_offset.y = dizzy * -1 * .04 * sin((delta_tracker - time_to_sway) * cycle_scale * PI / 2)
 		else:
 			next_camera_rot_offset.z = lerp(camera_rot_offset.z, 0.0, .25)
 			camera_pos_offset.x = lerp(camera_pos_offset.x, 0.0, .25)
@@ -223,49 +213,47 @@ func _physics_process(delta: float) -> void:
 		next_camera_rot_offset.z = step_bob * .5 * .04 * bobOscillate4
 		
 
-		if stage > period*15/16.0 or stage < period*1/16.0:
+		if stage > period * 15 / 16.0 or stage < period * 1 / 16.0:
 			step = "rpass"
-		elif stage > period*1/16.0 and stage < period*3/16.0:
+		elif stage > period * 1 / 16.0 and stage < period * 3 / 16.0:
 			step = "rhigh"
-		elif stage > period*3/16.0 and stage < period*5/16.0:
+		elif stage > period * 3 / 16.0 and stage < period * 5 / 16.0:
 			if step != "rcontact":
 				#.85
-				snowstep_r.pitch_scale = .85 + randf()/4
+				snowstep_r.pitch_scale = .85 + randf() / 4
 				snowstep_r.play()
 				
 			step = "rcontact"
-		elif stage > period*5/16.0 and stage < period*7/16.0:
+		elif stage > period * 5 / 16.0 and stage < period * 7 / 16.0:
 			if step != "rlow":
-				var offset = min(0, self.camera.rotation_degrees.x)/450
+				var offset = min(0, self.camera.rotation_degrees.x) / 450
 				sound_ui.right_start(.60, .10, offset)
 			step = "rlow"
-		elif stage > period*7/16.0 and stage < period*9/16.0:
+		elif stage > period * 7 / 16.0 and stage < period * 9 / 16.0:
 			step = "lpass"
-		elif stage > period*9/16.0 and stage < period*11/16.0:
+		elif stage > period * 9 / 16.0 and stage < period * 11 / 16.0:
 			step = "lhigh"
-		elif stage > period*11/16.0 and stage < period*13/16.0:
+		elif stage > period * 11 / 16.0 and stage < period * 13 / 16.0:
 			if step != "lcontact":
 				#1.15
-				snowstep_l.pitch_scale = 1.15 + randf()/4
+				snowstep_l.pitch_scale = 1.15 + randf() / 4
 				snowstep_l.play()
 				
 			step = "lcontact"
-		elif stage > period*13/16.0 and stage < period*15/16.0:
+		elif stage > period * 13 / 16.0 and stage < period * 15 / 16.0:
 			if step != "llow":
-				var offset = min(0, self.camera.rotation_degrees.x)/450
+				var offset = min(0, self.camera.rotation_degrees.x) / 450
 				sound_ui.left_start(.37, .1, offset)
 			step = "llow"
 
 
-			
-			
 		if step.begins_with("l"):
-			next_camera_rot_offset *= limp*2
-			camera_pos_offset *= limp*1.5
+			next_camera_rot_offset *= limp * 2
+			camera_pos_offset *= limp * 1.5
 			
 
 	camera.transform.origin = camera.transform.basis * camera_pos_offset
-	camera.rotation += (next_camera_rot_offset-camera_rot_offset)
+	camera.rotation += (next_camera_rot_offset - camera_rot_offset)
 	camera_rot_offset = next_camera_rot_offset
 	
 	move_and_slide()
@@ -290,7 +278,7 @@ func _rotate_camera(sens_mod: float = 1.0) -> void:
 	
 
 func _handle_joypad_camera_rotation(delta: float, sens_mod: float = 1.0) -> void:
-	var joypad_dir: Vector2 = Input.get_vector("look_left","look_right","look_up","look_down")
+	var joypad_dir: Vector2 = Input.get_vector("look_left", "look_right", "look_up", "look_down")
 	if joypad_dir.length() > 0:
 		look_dir += joypad_dir * delta
 		_rotate_camera(sens_mod)

@@ -17,8 +17,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-SignalBus="*res://SignalBus.gd"
-Util="*res://util.gd"
+SignalBus="*res://globals/SignalBus.gd"
+Util="*res://globals/util.gd"
+WorldState="*res://globals/world_state.gd"
 
 [display]
 

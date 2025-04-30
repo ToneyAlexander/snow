@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cuhink404aisk"]
 
-[ext_resource type="Theme" uid="uid://hqmbgt8f38n0" path="res://font_theme_1.tres" id="1_wnwrv"]
-[ext_resource type="Script" uid="uid://cx42bjbj4o55a" path="res://dialog.gd" id="2_g4c6n"]
+[ext_resource type="Theme" uid="uid://hqmbgt8f38n0" path="res://font_theme_1.tres" id="1_xvgi0"]
+[ext_resource type="Script" uid="uid://cx42bjbj4o55a" path="res://ui/dialog.gd" id="2_xsbcq"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qt76e"]
 bg_color = Color(0.537833, 0.53, 1, 0.278431)
@@ -19,8 +19,8 @@ offset_top = -500.0
 offset_right = 600.0
 grow_horizontal = 2
 grow_vertical = 0
-theme = ExtResource("1_wnwrv")
-script = ExtResource("2_g4c6n")
+theme = ExtResource("1_xvgi0")
+script = ExtResource("2_xsbcq")
 
 [node name="exit" type="Button" parent="."]
 layout_mode = 1
