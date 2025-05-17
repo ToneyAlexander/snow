@@ -215,8 +215,11 @@ shape = SubResource("BoxShape3D_gd4vy")
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 8.37502, 0)
 light_color = Color(0.119877, 0.000155318, 0.349123, 1)
 
-[node name="you" type="CharacterBody3D" parent="." node_paths=PackedStringArray("sound_ui")]
+[node name="PLAYER_POS" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.09943, 1.92094, 2.08696)
+
+[node name="you" type="CharacterBody3D" parent="." node_paths=PackedStringArray("sound_ui")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5259, 1.92094, -4.39977)
 script = ExtResource("1_aeddv")
 sound_ui = NodePath("../SoundUI")
 limp = 1.0
@@ -266,6 +269,10 @@ debug_shape_custom_color = Color(1, 1, 1, 1)
 
 [node name="them" parent="." instance=ExtResource("5_tw3kd")]
 transform = Transform3D(-0.971134, 0, 0.238533, 0, 1, 0, -0.238533, 0, -0.971134, 12.7823, 1.34986, -7.409)
+
+[node name="Sophie" parent="." instance=ExtResource("5_tw3kd")]
+transform = Transform3D(-0.971134, 0, 0.238533, 0, 1, 0, -0.238533, 0, -0.971134, 15.8433, 1.34986, -7.409)
+person_name = "Sophie"
 
 [node name="SnowParticles" type="GPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.21976, 10.3244, 2.1549)

@@ -68,6 +68,8 @@ var eyepos: Vector3 = Vector3(0, 0.441, 0)
 var conversing: bool = false
 var conversing_camera_transform
 
+var looking_at = null
+
 
 var dialog_scene = preload("res://ui/dialog_control.tscn")
 
@@ -109,7 +111,10 @@ func _physics_process(delta: float) -> void:
 		
 	var collider = eye_ray.get_collider()
 	Util.dg("lookin_at", collider)
-	if eye_ray.is_colliding() and is_instance_of(collider, StaticBody3D) and (collider.name == "them"):
+	if eye_ray.is_colliding() and is_instance_of(collider, Conversable):
+		if collider.get_person_name() != looking_at:
+			look_accumulator = 0
+			looking_at = collider.get_person_name()
 		look_accumulator += delta
 		Util.dg("lk_accum", look_accumulator)
 		if look_accumulator > .5:
@@ -128,7 +133,7 @@ func _physics_process(delta: float) -> void:
 			var dialog = dialog_scene.instantiate()
 			get_tree().root.add_child(dialog)
 
-			SignalBus._conversation.emit(true, "them")
+			SignalBus._conversation.emit(true, collider.get_person_name())
 			
 			# call trigger on the one I'm looking at
 			collider.trigger()

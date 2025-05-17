@@ -1,0 +1,140 @@
+[gd_resource type="Resource" script_class="DialogTreeCollection" load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://dialog/dialog_tree_collection.gd" id="1_wnf1w"]
+[ext_resource type="Script" path="res://dialog/dialog_state.gd" id="2_k2gsb"]
+
+[sub_resource type="Resource" id="Resource_ulqtn"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String]([])
+choices = Array[String](["Response"])
+short_choices = Array[String](["Response"])
+states = Array[ExtResource("2_k2gsb")]([null])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_8cglv"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String](["dir 1"])
+choices = Array[String](["I know you're Thelma"])
+short_choices = Array[String](["I know you're Thelma"])
+states = Array[ExtResource("2_k2gsb")]([null])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_qvos8"]
+script = ExtResource("2_k2gsb")
+speaker = "them"
+directions = Array[String](["🤔", "chilly", "Who is this...", "You're feeling pretty tired"])
+choices = Array[String](["My name is Thelma", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."])
+short_choices = Array[String](["My name is Thelma", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."])
+states = Array[ExtResource("2_k2gsb")]([SubResource("Resource_ulqtn"), SubResource("Resource_8cglv")])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_0yc67"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String]([])
+choices = Array[String](["E"])
+short_choices = Array[String](["E"])
+states = Array[ExtResource("2_k2gsb")]([null])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_jgjeo"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String]([])
+choices = Array[String](["F
+G"])
+short_choices = Array[String](["F"])
+states = Array[ExtResource("2_k2gsb")]([null])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_xofoe"]
+script = ExtResource("2_k2gsb")
+speaker = "Sophie"
+directions = Array[String]([])
+choices = Array[String](["C", "D"])
+short_choices = Array[String](["C", "D"])
+states = Array[ExtResource("2_k2gsb")]([SubResource("Resource_0yc67"), SubResource("Resource_jgjeo")])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_fljf2"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String]([])
+choices = Array[String](["B
+B!!"])
+short_choices = Array[String](["B"])
+states = Array[ExtResource("2_k2gsb")]([SubResource("Resource_xofoe")])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_d2ur6"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String]([])
+choices = Array[String](["b..."])
+short_choices = Array[String](["b..."])
+states = Array[ExtResource("2_k2gsb")]([null])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_4ok5h"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String]([])
+choices = Array[String](["C"])
+short_choices = Array[String](["C"])
+states = Array[ExtResource("2_k2gsb")]([null])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_whxpe"]
+script = ExtResource("2_k2gsb")
+speaker = "Sophie"
+directions = Array[String]([])
+choices = Array[String](["mmmm..."])
+short_choices = Array[String](["mmmm..."])
+states = Array[ExtResource("2_k2gsb")]([null])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_ohava"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String]([])
+choices = Array[String](["!!!"])
+short_choices = Array[String](["!!!"])
+states = Array[ExtResource("2_k2gsb")]([SubResource("Resource_whxpe")])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_desdr"]
+script = ExtResource("2_k2gsb")
+speaker = "Sophie"
+directions = Array[String]([])
+choices = Array[String](["mmm.", "mmmmm...
+mm?"])
+short_choices = Array[String](["mmm.", "mmmmm..."])
+states = Array[ExtResource("2_k2gsb")]([SubResource("Resource_4ok5h"), SubResource("Resource_ohava")])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_mqv4w"]
+script = ExtResource("2_k2gsb")
+speaker = "Eucl"
+directions = Array[String]([])
+choices = Array[String](["B."])
+short_choices = Array[String](["B."])
+states = Array[ExtResource("2_k2gsb")]([SubResource("Resource_desdr")])
+side_effects = []
+
+[sub_resource type="Resource" id="Resource_33fl8"]
+script = ExtResource("2_k2gsb")
+speaker = "Sophie"
+directions = Array[String]([])
+choices = Array[String](["A", "A!!!", "A?"])
+short_choices = Array[String](["A", "A!!!", "A?"])
+states = Array[ExtResource("2_k2gsb")]([SubResource("Resource_fljf2"), SubResource("Resource_d2ur6"), SubResource("Resource_mqv4w")])
+side_effects = []
+
+[resource]
+script = ExtResource("1_wnf1w")
+trees = Dictionary[String, ExtResource("2_k2gsb")]({
+"Sophie": SubResource("Resource_33fl8"),
+"them": SubResource("Resource_qvos8")
+})
