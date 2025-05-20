@@ -8,6 +8,19 @@ import subprocess
 import sys
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
+import ssl
+import http.server
+
+
+"""
+To configure a static hostname:
+Go to router settings, advanced
+IPv4 Address Distribution > Connection List
+Edit the machine entry to be static
+
+DNS Server
+Add entry, where hostname will be URL (toney.net)
+"""
 
 
 # See cpython GH-17851 and GH-17864.
@@ -38,13 +51,25 @@ def shell_open(url):
 def serve(root, port, run_browser):
     os.chdir(root)
 
-    address = ("", port)
-    httpd = DualStackServer(address, CORSRequestHandler)
+    server_address = ("0.0.0.0", port)
+    handler = http.server.SimpleHTTPRequestHandler
 
-    url = f"http://127.0.0.1:{port}"
+    httpd = http.server.HTTPServer(server_address, handler)
+
+    # Create an SSL context
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    cert_path = os.path.expanduser("~/certs/cert.pem")
+    key_path = os.path.expanduser("~/certs/key.pem")
+
+    context.load_cert_chain(certfile=cert_path, keyfile=key_path)
+
+    httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
+
+    url = f"https://{socket.gethostbyname(socket.gethostname())}:{port}"
     if run_browser:
-        # Open the served page in the user's default browser.
-        print(f"Opening the served URL in the default browser (use `--no-browser` or `-n` to disable this): {url}")
+        print(
+            f"Opening {url} in the browser. Use `--no-browser` or `-n` to disable this"
+        )
         shell_open(url)
     else:
         print(f"Serving at: {url}")
@@ -54,19 +79,26 @@ def serve(root, port, run_browser):
     except KeyboardInterrupt:
         print("\nKeyboard interrupt received, stopping server.")
     finally:
-        # Clean-up server
         httpd.server_close()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--port", help="port to listen on", default=8060, type=int)
+    parser.add_argument("-p", "--port", help="port to listen on", default=443, type=int)
     parser.add_argument(
-        "-r", "--root", help="path to serve as root (relative to `platform/web/`)", default="../../bin", type=Path
+        "-r",
+        "--root",
+        help="path to serve as root (relative to `platform/web/`)",
+        default="../../bin",
+        type=Path,
     )
     browser_parser = parser.add_mutually_exclusive_group(required=False)
     browser_parser.add_argument(
-        "-n", "--no-browser", help="don't open default web browser automatically", dest="browser", action="store_false"
+        "-n",
+        "--no-browser",
+        help="don't open default web browser automatically",
+        dest="browser",
+        action="store_false",
     )
     parser.set_defaults(browser=True)
     args = parser.parse_args()
