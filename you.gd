@@ -63,11 +63,13 @@ var touch_environment: bool = false
 var touch_accumulator: float = 0
 
 
-var eyepos: Vector3 = Vector3(0, 0.441, 0)
+var eyepos: Vector3 = Vector3(0, 0.441, 0) - Vector3(0, .5, 0)
 
+var block_conversation := false
 var conversing: bool = false
 var conversing_camera_transform
 
+var stored_fov = null
 var looking_at = null
 
 
@@ -76,6 +78,7 @@ var dialog_scene = preload("res://ui/dialog_control.tscn")
 
 func _ready() -> void:
 	capture_mouse()
+	stored_fov = camera.fov
 	SignalBus.connect("_conversation", _conversation)
 
 
@@ -86,6 +89,8 @@ func _ready() -> void:
 func _conversation(is_conversing: bool, partner: String):
 	self.conversing = is_conversing
 	if !self.conversing:
+		camera.fov = stored_fov
+		self.block_conversation = true
 		capture_mouse()
 		# POLISH 020: lerpy
 		camera.transform = camera_placeholder.transform
@@ -105,21 +110,29 @@ func capture_mouse() -> void:
 func _process(_delta: float) -> void:
 	pass
 
-func _physics_process(delta: float) -> void:
-	if conversing:
-		return
-		
+func handle_eye_contact(delta: float):
 	var collider = eye_ray.get_collider()
 	Util.dg("lookin_at", collider)
+	# POLISH 037: Remove the collider != self check? briefly after conversation, collider is hitting you
+	if block_conversation and collider != self and (
+		collider == null or
+		(not is_instance_of(collider, Conversable)) or
+		(collider.get_person_name() != looking_at)
+	):
+		block_conversation = false
+
+	if block_conversation:
+		return
+
 	if eye_ray.is_colliding() and is_instance_of(collider, Conversable):
 		if collider.get_person_name() != looking_at:
 			look_accumulator = 0
 			looking_at = collider.get_person_name()
 		look_accumulator += delta
-		Util.dg("lk_accum", look_accumulator)
-		if look_accumulator > .5:
+		camera.fov = lerp(camera.fov, stored_fov - look_accumulator / 2 * 40, .1)
+		if look_accumulator > 1:
 			collider.lerp_look(self.global_position)
-		if look_accumulator > 1 and not conversing:
+		if look_accumulator > 2 and not conversing:
 			release_mouse()
 			#conversing_camera_transform = collider.get_transform()
 			#	bool has_method( String arg0 ) const
@@ -138,8 +151,14 @@ func _physics_process(delta: float) -> void:
 			# call trigger on the one I'm looking at
 			collider.trigger()
 	else:
+		camera.fov = lerpf(camera.fov, stored_fov, .1)
 		look_accumulator = 0
+
+func _physics_process(delta: float) -> void:
+	if conversing:
+		return
 	
+	handle_eye_contact(delta)
 	
 	if conversing:
 		return

@@ -4,7 +4,7 @@ extends Control
 @onready var logContainer: VBoxContainer = $logScroll/logContainer
 @onready var scrollContainer: ScrollContainer = $logScroll
 
-@onready var buttonBox: HFlowContainer = $options
+@onready var buttonBox: Container = $options
 
 var conversation = []
 
@@ -13,7 +13,9 @@ var current_partner = ""
 
 var thoughts_control = preload("res://ui/thoughts_control.tscn")
 var thoughts_scene
-	
+
+var single_speech_box = preload("res://ui/dialog_box.tscn")
+var dialog_option_button = preload("res://ui/dialog_option.tscn")
 	
 func clear_children(node):
 	for n in node.get_children():
@@ -26,6 +28,11 @@ func _ready() -> void:
 	
 	SignalBus.connect("_conversation", recieve_conversing_event)
 	exit.pressed.connect(_exit_pressed)
+	get_viewport().size_changed.connect(screen_size_changed)
+	screen_size_changed()
+
+func screen_size_changed():
+	self.exit.add_theme_font_size_override("normal_font_size", int(18 * Util.get_composite_text_scale()))
 
 func execute_tree():
 	if dialog_tree == null || dialog_tree.choices.size() == 0 || dialog_tree.speaker == "TERMINUS":
@@ -33,10 +40,16 @@ func execute_tree():
 
 	if dialog_tree.speaker == current_partner:
 		for i in range(dialog_tree.short_choices.size()):
-			var btn = Button.new()
+			var btn = dialog_option_button.instantiate()
+			btn.add_theme_font_size_override("font_size", int(14 * Util.get_composite_text_scale()))
 			btn.pressed.connect(func(): _dialog_selected(i))
 			btn.text = dialog_tree.short_choices[i]
 			buttonBox.add_child(btn)
+
+		var filler = Control.new()
+		filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		filler.size_flags_stretch_ratio = max(0, 4-dialog_tree.short_choices.size())
+		buttonBox.add_child(filler)
 		
 		for d in dialog_tree.directions:
 			SignalBus._think.emit(d)
@@ -101,7 +114,7 @@ func bottom_scroll():
 func bottom_scroll_def():
 	# double defferral
 	# https://forum.godotengine.org/t/how-to-get-scrollbar-to-automatically-scroll-to-bottom/74013/7
-	scrollContainer.scroll_vertical = scrollContainer.get_v_scroll_bar().max_value
+	scrollContainer.scroll_vertical = int(scrollContainer.get_v_scroll_bar().max_value)
 
 
 func add_speech(speaker: String, text: String):
@@ -112,33 +125,8 @@ func add_speech(speaker: String, text: String):
 		add_line(text, BoxContainer.ALIGNMENT_BEGIN)
 
 func add_line(text: String, alignment: HBoxContainer.AlignmentMode):
-	var ta = "left" if alignment == 0 else "right"
-	var l = 0
-	var r = 0
-	if alignment == 0:
-		r = 200
-	else:
-		l = 200
-		
-	var element = RichTextLabel.new()
-	element.bbcode_enabled = true
-	var box = HBoxContainer.new()
-	var margin = MarginContainer.new()
-	var margin_value = 20
-
-	margin.add_theme_constant_override("margin_left", margin_value + l)
-	margin.add_theme_constant_override("margin_bottom", margin_value)
-	margin.add_theme_constant_override("margin_right", margin_value + r)
-
-	box.alignment = alignment
-	element.add_theme_constant_override("outline_size", 18)
-	element.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	element.fit_content = true
-	margin.custom_minimum_size = Vector2(scrollContainer.size.x - 10, 0)
-	box.custom_minimum_size = Vector2(scrollContainer.size.x - 10, 0)
-	
-	element.append_text("[" + ta + "]" + text + "[/" + ta + "]")
-	margin.add_child(element)
-	box.add_child(margin)
-	logContainer.add_child(box)
+	var item: DialogBox = single_speech_box.instantiate()
+	item.alignment = alignment
+	item.text = text
+	logContainer.add_child(item)
 	call_deferred("bottom_scroll")

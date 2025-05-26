@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://dh4xld0x8ansm"]
+
+[ext_resource type="Script" uid="uid://da3316mg4mji5" path="res://ui/dialog_box.gd" id="1_m0eb4"]
+
+[node name="DialogBox" type="HBoxContainer"]
+anchors_preset = -1
+anchor_right = 1.0
+grow_horizontal = 2
+script = ExtResource("1_m0eb4")
+
+[node name="margin" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(1481, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 220
+theme_override_constants/margin_bottom = 20
+
+[node name="speech" type="RichTextLabel" parent="margin"]
+clip_contents = false
+layout_mode = 2
+theme_override_constants/outline_size = 18
+bbcode_enabled = true
+fit_content = true

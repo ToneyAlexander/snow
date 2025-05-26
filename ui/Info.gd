@@ -7,11 +7,19 @@ var registered_data = {}
 var unregistered_order = []
 var unregistered_data = {}
 
+var base_size = 15
 
 func _ready() -> void:
 	for item in registered_order:
 		registered_set[item] = null
 	SignalBus.connect("_debug_display", recieve_event)
+	get_viewport().size_changed.connect(screen_size_changed)
+	screen_size_changed()
+
+
+func screen_size_changed():
+	self.label_settings.font_size = int(base_size * Util.get_composite_text_scale())
+	refresh()
 
 
 func recieve_event(tag: String, input_value):

@@ -7,9 +7,6 @@ class_name SoundLabel extends Label
 
 const sound_label: PackedScene = preload("res://ui/sound_label.tscn")
 
-var SCREEN_X = 1920.0
-var SCREEN_Y = 1080.0
-
 var active = false
 var track: Vector3
 
@@ -47,6 +44,8 @@ func place_label(lerp_rate: float = .5):
 	# Scale factor = intensity/(distance_constant + distance_squared)
 	var sf = I / (n + d_square)
 	
+	var SCREEN_X = get_viewport().size.x
+	var SCREEN_Y = get_viewport().size.y
 	# BUG 009: bug where walking such that something moves from front to back makes it pop into bottom right corner?
 	if behind:
 		# flip it around

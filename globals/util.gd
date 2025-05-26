@@ -31,3 +31,13 @@ func dg(tag: String, value, truncate: bool = true):
 	SignalBus._debug_display.emit(tag, value)
 
 #Util.dg("g_pos", self.position.round())
+
+func get_composite_text_scale() -> float:
+	var screen_scale = DisplayServer.screen_get_scale()
+	var viewport_size = get_viewport().size
+
+	var reference_size = Vector2(1440, 1440)
+	var viewport_scale = max(reference_size.x / viewport_size.x, reference_size.y / viewport_size.y)
+
+	var composite_scale = screen_scale * viewport_scale
+	return clamp(composite_scale, 0.75, 3.0)

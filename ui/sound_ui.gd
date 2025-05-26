@@ -3,11 +3,10 @@ extends Control
 @onready var l_sound := $left
 @onready var r_sound := $right
 
-# FEAT 013: unhardcode positions/screenszie
 # FEAT 017: discrete vs continuous sounds
 
-var SCREEN_X = 1920.0
-var SCREEN_Y = 1080.0
+var SCREEN_X
+var SCREEN_Y
 
 var Y_OFFSET_L
 var Y_OFFSET_R
@@ -18,12 +17,18 @@ var X_OFFSET_R
 var L_ONOMATOPOEIA := ["*cronch*", "*crunch*", "*scrunch*", "*crinch*"] # ["*crinch*", "*crunch*", "*scrinch*"]
 var R_ONOMATOPOEIA := ["*cronch*", "*crunch*", "*scrunch*", "*crinch*"]
 
-func _ready() -> void:
+func screen_size_changed():
+	SCREEN_X = get_viewport().size.x
+	SCREEN_Y = get_viewport().size.y
 	Y_OFFSET_L = SCREEN_Y * .9 - l_sound.size.y / 2
 	Y_OFFSET_R = SCREEN_Y * .9 - r_sound.size.y / 2
 	X_OFFSET_L = SCREEN_X * .25 - l_sound.size.x / 2 # center label on point
 	X_OFFSET_R = SCREEN_X * .75 - r_sound.size.x / 1.2 # center label on point
-	
+
+func _ready() -> void:
+	get_viewport().size_changed.connect(screen_size_changed)
+	screen_size_changed()
+
 var t = 0
 var c = 0
 

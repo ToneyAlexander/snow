@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://dhpndeltfslju" path="res://ui/Info.gd" id="6_l8v81"]
 [ext_resource type="PackedScene" uid="uid://cikefkbbdri4e" path="res://models/cricket.gltf" id="6_qwhpj"]
 [ext_resource type="Script" uid="uid://cw0sb2pmx5o68" path="res://globals/world_environment.gd" id="10_gd4vy"]
+[ext_resource type="Environment" uid="uid://54kuao6y7vvq" path="res://worldenv.tres" id="11_blcw0"]
 [ext_resource type="Script" uid="uid://3oj03x4msbni" path="res://ui/crosshair.gd" id="12_qw60f"]
 [ext_resource type="Script" uid="uid://om4w0r3iblva" path="res://cricket.gd" id="15_qt76e"]
 [ext_resource type="Script" uid="uid://cidetwf8fjxhh" path="res://ui/sound_ui.gd" id="15_sq7yr"]
@@ -107,19 +108,6 @@ directional_velocity_max = -1.00002
 directional_velocity_curve = SubResource("CurveXYZTexture_timh0")
 scale_min = 0.2
 scale_curve = SubResource("CurveTexture_urp22")
-
-[sub_resource type="Environment" id="Environment_4dy88"]
-background_mode = 1
-background_color = Color(0.180392, 0.180392, 0.180392, 1)
-ambient_light_source = 3
-ambient_light_color = Color(0.612862, 0.510485, 0.999995, 1)
-ambient_light_energy = 0.25
-fog_mode = 1
-fog_light_color = Color(0.121569, 0, 0.34902, 1)
-fog_light_energy = 0.05
-fog_density = 1.0
-fog_depth_curve = 0.25
-fog_depth_end = 20.0
 
 [sub_resource type="LabelSettings" id="LabelSettings_l8v81"]
 font_size = 30
@@ -255,7 +243,7 @@ skeleton = NodePath("../..")
 
 [node name="Camera" type="Camera3D" parent="you"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.441, 0)
-fov = 90.0
+fov = 110.0
 
 [node name="OmniLight3D" type="OmniLight3D" parent="you/Camera"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.119328, 1.09212, -0.743396)
@@ -293,7 +281,7 @@ draw_pass_1 = ExtResource("2_fas56")
 script = ExtResource("4_3jtbb")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_4dy88")
+environment = ExtResource("11_blcw0")
 script = ExtResource("10_gd4vy")
 
 [node name="lamp" parent="." node_paths=PackedStringArray("velocity_source") instance=ExtResource("2_gd4vy")]
@@ -380,14 +368,15 @@ color = Color(0.78, 0.78, 0.78, 0.737255)
 
 [node name="Debug" type="Control" parent="."]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
 
 [node name="Info" type="Label" parent="Debug"]
-layout_mode = 0
-offset_right = 183.0
-offset_bottom = 42.0
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+grow_horizontal = 2
 label_settings = SubResource("LabelSettings_l8v81")
 script = ExtResource("6_l8v81")
 

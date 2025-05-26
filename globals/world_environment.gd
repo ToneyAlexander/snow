@@ -10,5 +10,13 @@ extends WorldEnvironment
 # pick important components to adjust and test
 # Change source to background... kind of interesting
 
+@export var enabled := true
+
+var environment_scene = preload("res://worldenv.tres")
+
 func _ready() -> void:
-	self.environment.fog_enabled = true
+	if enabled:
+		self.environment = environment_scene
+		self.environment.fog_enabled = true
+	else:
+		self.environment = null
