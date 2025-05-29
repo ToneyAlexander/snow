@@ -44,8 +44,9 @@ func place_label(lerp_rate: float = .5):
 	# Scale factor = intensity/(distance_constant + distance_squared)
 	var sf = I / (n + d_square)
 	
-	var SCREEN_X = get_viewport().size.x
-	var SCREEN_Y = get_viewport().size.y
+	var parent = self.get_parent()
+	var SCREEN_X = parent.size.x
+	var SCREEN_Y = parent.size.y
 	# BUG 009: bug where walking such that something moves from front to back makes it pop into bottom right corner?
 	if behind:
 		# flip it around

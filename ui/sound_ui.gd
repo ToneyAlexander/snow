@@ -5,29 +5,12 @@ extends Control
 
 # FEAT 017: discrete vs continuous sounds
 
-var SCREEN_X
-var SCREEN_Y
-
-var Y_OFFSET_L
-var Y_OFFSET_R
-var X_OFFSET_L
-var X_OFFSET_R
-
-
 var L_ONOMATOPOEIA := ["*cronch*", "*crunch*", "*scrunch*", "*crinch*"] # ["*crinch*", "*crunch*", "*scrinch*"]
 var R_ONOMATOPOEIA := ["*cronch*", "*crunch*", "*scrunch*", "*crinch*"]
 
-func screen_size_changed():
-	SCREEN_X = get_viewport().size.x
-	SCREEN_Y = get_viewport().size.y
-	Y_OFFSET_L = SCREEN_Y * .9 - l_sound.size.y / 2
-	Y_OFFSET_R = SCREEN_Y * .9 - r_sound.size.y / 2
-	X_OFFSET_L = SCREEN_X * .25 - l_sound.size.x / 2 # center label on point
-	X_OFFSET_R = SCREEN_X * .75 - r_sound.size.x / 1.2 # center label on point
-
 func _ready() -> void:
-	get_viewport().size_changed.connect(screen_size_changed)
-	screen_size_changed()
+	l_sound.pivot_offset = l_sound.size/2
+	r_sound.pivot_offset = r_sound.size/2
 
 var t = 0
 var c = 0
@@ -66,8 +49,8 @@ func discrete_sound(sound_label: SoundLabel, duration: float, delay: float = 0.0
 
 # offset is percent of screen height
 func left_start(duration: float, delay: float = 0.0, y_offset: float = 0.0):
-	var offset = Vector2(randf_range(-50, 50), randf_range(-50, 50) + SCREEN_Y * y_offset)
-	l_sound.position = Vector2(X_OFFSET_L, Y_OFFSET_L) + offset
+	l_sound.offset_left = randf_range(-50, 50) - l_sound.size.x / 2
+	l_sound.offset_top = randf_range(-50, 50) + self.size.y * y_offset - l_sound.size.y / 2
 	l_sound.rotation_degrees = randf_range(0, 20)
 	if l_sound is RichTextLabel:
 		l_sound.text = "[i]" + L_ONOMATOPOEIA.pick_random() + "[/i]"
@@ -80,8 +63,8 @@ func left_start(duration: float, delay: float = 0.0, y_offset: float = 0.0):
 
 # offset is percent of screen height
 func right_start(duration: float, delay: float = 0.0, y_offset: float = 0.0):
-	var offset = Vector2(randf_range(-50, 50), randf_range(-50, 50) + SCREEN_Y * y_offset)
-	r_sound.position = Vector2(X_OFFSET_R, Y_OFFSET_L) + offset
+	r_sound.offset_left = randf_range(-50, 50) - r_sound.size.x / 2
+	r_sound.offset_top = randf_range(-50, 50) + self.size.y * y_offset - r_sound.size.y / 2
 	r_sound.rotation_degrees = randf_range(-20, 0)
 	if r_sound is RichTextLabel:
 		r_sound.text = "[i]" + R_ONOMATOPOEIA.pick_random() + "[/i]"
